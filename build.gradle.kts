@@ -74,16 +74,19 @@ dependencies {
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
 
+    // Additional Libraries
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
+
     // WPILib and Vendors
     with(wpi.java) {
         deps.wpilib().forEach { implementation(it.get()) }
         vendor.java().forEach { implementation(it.get()) }
 
-        deps.wpilibJniDebug(NativePlatforms.roborio).forEach { "roborioDebug"(it.get()) }
-        vendor.jniDebug(NativePlatforms.roborio).forEach { "roborioDebug"(it.get()) }
+        deps.wpilibJniDebug(NativePlatforms.roborio).forEach { "roborioDebug"(it) }
+        vendor.jniDebug(NativePlatforms.roborio).forEach { "roborioDebug"(it) }
 
-        deps.wpilibJniRelease(NativePlatforms.roborio).forEach { "roborioRelease"(it.get()) }
-        vendor.jniRelease(NativePlatforms.roborio).forEach { "roborioRelease"(it.get()) }
+        deps.wpilibJniRelease(NativePlatforms.roborio).forEach { "roborioRelease"(it) }
+        vendor.jniRelease(NativePlatforms.roborio).forEach { "roborioRelease"(it) }
 
         deps.wpilibJniDebug(NativePlatforms.desktop).forEach { nativeDebug(it) }
         vendor.jniDebug(NativePlatforms.desktop).forEach { nativeDebug(it) }
