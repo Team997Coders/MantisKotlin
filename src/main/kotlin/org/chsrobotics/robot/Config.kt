@@ -10,5 +10,5 @@ object Config {
         ARCADE_CURVATURE_MIX_BIAS_CURVATURE("Arcade-Curvature Mix (Curvature Bias)"),
         ARCADE_CURVATURE_MIX_BIAS_ARCADE("Arcade-Curvature Mix (Arcade Bias)");
     }
-    val DRIVE_MODE_CHOOSER = DashboardChooser.fromEnum("DriveModeChooser", DriveMode.ARCADE_CURVATURE_MIX_EVEN)
+    val DriveModeChooser = DashboardChooser.fromEnum("DriveModeChooser", DriveMode.ARCADE_CURVATURE_MIX_EVEN)
 }

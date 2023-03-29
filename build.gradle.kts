@@ -76,6 +76,7 @@ dependencies {
 
     // Additional Libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
+    implementation("com.fazecast:jSerialComm:2.9.3")
 
     // WPILib and Vendors
     with(wpi.java) {
