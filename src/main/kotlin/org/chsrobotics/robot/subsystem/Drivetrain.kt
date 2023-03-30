@@ -7,14 +7,17 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.wpilibj.Encoder
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import io.mehow.ruler.Distance
 import org.chsrobotics.robot.Constant
+import org.chsrobotics.robot.HardwareID
 import org.chsrobotics.robot.Robot
+import org.chsrobotics.robot.Tuning
 import org.chsrobotics.robot.drivemode.DifferentialInput
 
 class Drivetrain : SubsystemBase() {
     enum class Gear(val shift: Boolean) {
-        HIGH(!Constant.Solenoids.SHIFTER.inverted),
-        LOW(Constant.Solenoids.SHIFTER.inverted)
+        HIGH(!HardwareID.SHIFTER.inverted),
+        LOW(HardwareID.SHIFTER.inverted)
     }
     enum class IdleMode(val value: CANSparkMax.IdleMode) {
         COAST(CANSparkMax.IdleMode.kCoast),
@@ -22,14 +25,14 @@ class Drivetrain : SubsystemBase() {
     }
 
     // Motors
-    private val leftFrontMotor = CANSparkMax(Constant.Motor.Drivetrain.LEFT_FRONT.id, MotorType.kBrushless)
-    private val leftBackMotor = CANSparkMax(Constant.Motor.Drivetrain.LEFT_BACK.id, MotorType.kBrushless)
-    private val rightFrontMotor = CANSparkMax(Constant.Motor.Drivetrain.RIGHT_FRONT.id, MotorType.kBrushless)
-    private val rightBackMotor = CANSparkMax(Constant.Motor.Drivetrain.RIGHT_BACK.id, MotorType.kBrushless)
+    private val leftFrontMotor = CANSparkMax(HardwareID.LEFT_FRONT_MOTOR.id, MotorType.kBrushless)
+    private val leftBackMotor = CANSparkMax(HardwareID.LEFT_BACK_MOTOR.id, MotorType.kBrushless)
+    private val rightFrontMotor = CANSparkMax(HardwareID.RIGHT_FRONT_MOTOR.id, MotorType.kBrushless)
+    private val rightBackMotor = CANSparkMax(HardwareID.RIGHT_BACK_MOTOR.id, MotorType.kBrushless)
 
     // Encoders
-    private val leftEncoder = Encoder(Constant.Encoder.Drivetrain.LEFT_ENCODER_A.id, Constant.Encoder.Drivetrain.LEFT_ENCODER_B.id)
-    private val rightEncoder = Encoder(Constant.Encoder.Drivetrain.RIGHT_ENCODER_A.id, Constant.Encoder.Drivetrain.RIGHT_ENCODER_B.id)
+    private val leftEncoder = Encoder(HardwareID.LEFT_ENCODER_A.id, HardwareID.LEFT_ENCODER_B.id)
+    private val rightEncoder = Encoder(HardwareID.RIGHT_ENCODER_A.id, HardwareID.RIGHT_ENCODER_B.id)
 
     var gear: Gear
         get() = Gear.values().first { it.shift == Robot.pneumatics.shifter.get() }
@@ -48,29 +51,36 @@ class Drivetrain : SubsystemBase() {
             }
         }
 
-    var leftVoltage = 0.0
+    var leftSpeed = 0.0
         set(speed) {
-            leftFrontMotor.setVoltage(speed)
-            leftBackMotor.setVoltage(speed)
+            leftFrontMotor.setVoltage(speed * Tuning.LEFT_MOTOR_MULTIPLIER * 12.0)
+            leftBackMotor.setVoltage(speed * Tuning.LEFT_MOTOR_MULTIPLIER * 12.0)
             field = speed
         }
 
-    var rightVoltage = 0.0
+    var rightSpeed = 0.0
         set(speed) {
-            rightFrontMotor.setVoltage(speed)
-            rightBackMotor.setVoltage(speed)
+            rightFrontMotor.setVoltage(speed * Tuning.RIGHT_MOTOR_MULTIPLIER * 12.0)
+            rightBackMotor.setVoltage(speed * Tuning.RIGHT_MOTOR_MULTIPLIER * 12.0)
             field = speed
         }
 
-    var voltage: DifferentialInput
-        get() = DifferentialInput(leftVoltage, rightVoltage)
+    var speed: DifferentialInput
+        get() = DifferentialInput(leftSpeed, rightSpeed)
         set(value) {
-            leftVoltage = value.left
-            rightVoltage = value.right
+            leftSpeed = value.left
+            rightSpeed = value.right
         }
 
-    override fun periodic() {
-    }
+    var leftPosition: Distance = Distance.Zero
+        private set
+    var rightPosition: Distance = Distance.Zero
+        private set
+
+    var leftVelocity: Distance = Distance.Zero
+        private set
+    var rightVelocity: Distance = Distance.Zero
+        private set
 
     init {
         // Add motors to simulation
@@ -81,10 +91,15 @@ class Drivetrain : SubsystemBase() {
             REVPhysicsSim.getInstance().addSparkMax(rightBackMotor, DCMotor.getNEO(1))
         }
         // Invert motors if necessary
-        leftFrontMotor.inverted = Constant.Motor.Drivetrain.LEFT_FRONT.inverted
-        leftBackMotor.inverted = Constant.Motor.Drivetrain.LEFT_BACK.inverted
-        rightFrontMotor.inverted = Constant.Motor.Drivetrain.RIGHT_FRONT.inverted
-        rightBackMotor.inverted = Constant.Motor.Drivetrain.RIGHT_BACK.inverted
+        leftFrontMotor.inverted = HardwareID.LEFT_FRONT_MOTOR.inverted
+        leftBackMotor.inverted = HardwareID.LEFT_BACK_MOTOR.inverted
+        rightFrontMotor.inverted = HardwareID.RIGHT_FRONT_MOTOR.inverted
+        rightBackMotor.inverted = HardwareID.RIGHT_BACK_MOTOR.inverted
+
+        // Set encoder ratios
+        val distancePerPulse = Constant.ENCODER_RADIANS_PER_PULSE * Constant.WHEEL_RADIUS_METERS
+        leftEncoder.distancePerPulse = distancePerPulse
+        rightEncoder.distancePerPulse = distancePerPulse
 
         // Clear faults
         leftFrontMotor.clearFaults()
@@ -93,6 +108,16 @@ class Drivetrain : SubsystemBase() {
         rightBackMotor.clearFaults()
 
         // Set default gear
-        gear = Constant.Drivetrain.DEFAULT_GEAR
+        gear = Tuning.DEFAULT_GEAR
+    }
+
+    override fun periodic() {
+        // Get new encoder positions and differentiate
+        val leftPosition = Distance.ofMeters(leftEncoder.distance)
+        val rightPosition = Distance.ofMeters(rightEncoder.distance)
+        leftVelocity = (leftPosition - this.leftPosition) / Robot.period
+        rightVelocity = (rightPosition - this.rightPosition) / Robot.period
+        this.leftPosition = leftPosition
+        this.rightPosition = rightPosition
     }
 }

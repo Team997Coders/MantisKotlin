@@ -1,14 +1,12 @@
 package org.chsrobotics.robot
 
 import com.revrobotics.REVPhysicsSim
-import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import edu.wpi.first.wpilibj2.command.Commands
 import org.chsrobotics.robot.command.drivetrain.JoystickDrive
 import org.chsrobotics.robot.controller.G920Controller
 import org.chsrobotics.robot.subsystem.Drivetrain
+import org.chsrobotics.robot.subsystem.IMU
 import org.chsrobotics.robot.subsystem.Led
 import org.chsrobotics.robot.subsystem.Pneumatics
 
@@ -18,22 +16,13 @@ object Robot : TimedRobot() {
 
     // Subsystems
     val led = Led()
+    val imu = IMU()
     val pneumatics = Pneumatics()
     val drivetrain = Drivetrain()
 
     // Commands
     private val joystickDrive = JoystickDrive()
-    private var autonomousCommand = Commands.print("No autonomous command configured")
-
-    // Util
-    fun setAllianceLeds() {
-        val alliance = DriverStation.getAlliance()
-        if (alliance == Alliance.Red) {
-            led.state = Led.State.RED
-        } else {
-            led.state = Led.State.BLUE
-        }
-    }
+    private var autonomousCommand = Auto.BALANCE
 
     override fun robotInit() {
         Config.DriveModeChooser.registerListener { _, value ->
@@ -52,7 +41,7 @@ object Robot : TimedRobot() {
         // Set leds to current alliance color
         // Doing this in the periodic allows this to update when the alliance is switched in the driver station
         // Setting led state will only write to the Arduino if the new state differs from the current state.
-        setAllianceLeds()
+        led.setAllianceColors()
     }
     override fun disabledExit() {
         // Turn off leds

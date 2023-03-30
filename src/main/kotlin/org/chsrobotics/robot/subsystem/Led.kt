@@ -1,6 +1,7 @@
 package org.chsrobotics.robot.subsystem
 
 import com.fazecast.jSerialComm.SerialPort
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import kotlinx.coroutines.*
 import org.chsrobotics.robot.coroutine.SpartanDispatcher
@@ -28,6 +29,15 @@ class Led : SubsystemBase() {
         println(e)
         null
     }
+
+    fun setAllianceColors() {
+        state = if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+            State.RED
+        } else {
+            State.BLUE
+        }
+    }
+
     var state = State.OFF
         set(value) {
             if (field != value) {

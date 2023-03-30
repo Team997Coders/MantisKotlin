@@ -3,10 +3,7 @@ package org.chsrobotics.robot.telemetry
 import edu.wpi.first.networktables.NTSendable
 import edu.wpi.first.networktables.NTSendableBuilder
 import edu.wpi.first.networktables.NetworkTableEntry
-import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.util.sendable.SendableRegistry
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import java.security.InvalidParameterException
 import java.util.concurrent.atomic.AtomicInteger

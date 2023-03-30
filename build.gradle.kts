@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     kotlin("jvm") version "1.8.10"
-    id("edu.wpi.first.GradleRIO") version "2023.4.2"
+    id("edu.wpi.first.GradleRIO") version "2023.4.3"
 }
 
 group = "org.chsrobotics.robot"
@@ -77,6 +77,7 @@ dependencies {
     // Additional Libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
     implementation("com.fazecast:jSerialComm:2.9.3")
+    implementation("io.mehow.ruler:ruler:2.0.2")
 
     // WPILib and Vendors
     with(wpi.java) {
