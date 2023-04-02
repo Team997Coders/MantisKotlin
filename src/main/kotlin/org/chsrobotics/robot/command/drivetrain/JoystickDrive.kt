@@ -45,11 +45,17 @@ class JoystickDrive : CommandBase() {
             Led.State.OFF
         }
 
+        // Set Force Feedback
+        Robot.controller.setConstantForce(Robot.controller.rotationalAxis*2)
+
         // Set drivetrain motor outputs
         Robot.drivetrain.speed = driveMode.execute()
     }
 
     override fun end(interrupted: Boolean) {
+        // Disable Force Feedback
+        Robot.controller.setConstantForce(0.0)
+
         Robot.drivetrain.speed = DifferentialInput(0.0, 0.0)
     }
 }

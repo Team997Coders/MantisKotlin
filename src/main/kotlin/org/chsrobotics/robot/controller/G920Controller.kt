@@ -5,6 +5,7 @@ import org.chsrobotics.robot.HardwareID
 
 class G920Controller : Controller {
     private val controller = GenericHID(HardwareID.WHEEL_CONTROLLER)
+    private val forceFeedback = ForceFeedbackController()
     override val linearAxis: Double
         get() = (-controller.getRawAxis(1)+1)/2
     override val rotationalAxis: Double
@@ -19,4 +20,8 @@ class G920Controller : Controller {
         get() = controller.getRawButton(9)
     override val cubeButton: Boolean
         get() = controller.getRawButton(8)
+
+    override fun setConstantForce(magnitude: Double) {
+        forceFeedback.playConstantForce(magnitude)
+    }
 }
