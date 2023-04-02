@@ -3,7 +3,7 @@ package org.chsrobotics.robot.command.auto
 import edu.wpi.first.wpilibj2.command.CommandBase
 import org.chsrobotics.robot.Robot
 import org.chsrobotics.robot.Tuning
-import org.chsrobotics.robot.drivemode.DifferentialInput
+import org.chsrobotics.robot.drivemode.DifferentialOutput
 import org.chsrobotics.robot.subsystem.Drivetrain
 import org.chsrobotics.robot.subsystem.Led
 import kotlin.math.*
@@ -28,7 +28,7 @@ class Balance : CommandBase() {
         } else {
             // Drive uphill
             val speed = if (pitch>0) {-Tuning.BALANCE_SPEED} else {Tuning.BALANCE_SPEED}
-            Robot.drivetrain.speed = DifferentialInput(speed, speed)
+            Robot.drivetrain.output = DifferentialOutput(speed, speed)
 
             // Keep leds off unless balanced
             Robot.led.state = Led.State.OFF

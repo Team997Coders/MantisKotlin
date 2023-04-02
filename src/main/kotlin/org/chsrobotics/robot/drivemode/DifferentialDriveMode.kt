@@ -10,7 +10,7 @@ interface DifferentialDriveMode {
      *
      * @return The input, mapped to left and right side inputs.
      */
-    fun execute(): DifferentialInput
+    fun execute(): DifferentialOutput
 }
 
 /**
@@ -19,7 +19,7 @@ interface DifferentialDriveMode {
  * @param left : value corresponding with left side input.
  * @param right : value corresponding with right side input.
  */
-data class DifferentialInput (val left: Double, val right: Double) {
+data class DifferentialOutput (val left: Double, val right: Double) {
     /**
      * Returns a new DifferentialDrivetrainInput with the left and right values multiplied by a
      * scalar.
@@ -27,8 +27,8 @@ data class DifferentialInput (val left: Double, val right: Double) {
      * @param scalar The multiplicand.
      * @return A scaled DifferentialDrivetrainInput.
      */
-    fun multiply(scalar: Double): DifferentialInput {
-        return DifferentialInput(left * scalar, right * scalar)
+    fun multiply(scalar: Double): DifferentialOutput {
+        return DifferentialOutput(left * scalar, right * scalar)
     }
 
     /**
@@ -37,8 +37,8 @@ data class DifferentialInput (val left: Double, val right: Double) {
      * @param other The DifferentialDrivetrainInput to add.
      * @return The sum of the two DifferentialDrivetrainInputs.
      */
-    fun add(other: DifferentialInput): DifferentialInput {
-        return DifferentialInput(left + other.left, right + other.right)
+    fun add(other: DifferentialOutput): DifferentialOutput {
+        return DifferentialOutput(left + other.left, right + other.right)
     }
 
     /**
@@ -48,11 +48,11 @@ data class DifferentialInput (val left: Double, val right: Double) {
      * DifferentialDrivetrainInput of 0,0.
      * @return A DifferentialDrivetrainInput with left and right sides independently clamped.
      */
-    fun clamp(maxAbsValue: Double): DifferentialInput {
+    fun clamp(maxAbsValue: Double): DifferentialOutput {
         return if (abs(maxAbsValue) == 0.0) {
-            DifferentialInput(0.0, 0.0)
+            DifferentialOutput(0.0, 0.0)
         } else {
-            DifferentialInput(
+            DifferentialOutput(
                 MathUtil.clamp(left, -maxAbsValue, maxAbsValue),
                 MathUtil.clamp(right, -maxAbsValue, maxAbsValue)
             )

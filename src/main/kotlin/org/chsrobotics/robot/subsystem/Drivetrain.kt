@@ -12,7 +12,7 @@ import org.chsrobotics.robot.Constant
 import org.chsrobotics.robot.HardwareID
 import org.chsrobotics.robot.Robot
 import org.chsrobotics.robot.Tuning
-import org.chsrobotics.robot.drivemode.DifferentialInput
+import org.chsrobotics.robot.drivemode.DifferentialOutput
 
 class Drivetrain : SubsystemBase() {
     enum class Gear(val shift: Boolean) {
@@ -51,25 +51,25 @@ class Drivetrain : SubsystemBase() {
             }
         }
 
-    var leftSpeed = 0.0
+    var leftOutput = 0.0
         set(speed) {
             leftFrontMotor.setVoltage(speed * Tuning.LEFT_MOTOR_MULTIPLIER * 12.0)
             leftBackMotor.setVoltage(speed * Tuning.LEFT_MOTOR_MULTIPLIER * 12.0)
             field = speed
         }
 
-    var rightSpeed = 0.0
+    var rightOutput = 0.0
         set(speed) {
             rightFrontMotor.setVoltage(speed * Tuning.RIGHT_MOTOR_MULTIPLIER * 12.0)
             rightBackMotor.setVoltage(speed * Tuning.RIGHT_MOTOR_MULTIPLIER * 12.0)
             field = speed
         }
 
-    var speed: DifferentialInput
-        get() = DifferentialInput(leftSpeed, rightSpeed)
+    var output: DifferentialOutput
+        get() = DifferentialOutput(leftOutput, rightOutput)
         set(value) {
-            leftSpeed = value.left
-            rightSpeed = value.right
+            leftOutput = value.left
+            rightOutput = value.right
         }
 
     var leftPosition: Distance = Distance.Zero

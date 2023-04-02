@@ -25,11 +25,11 @@ class ArcadeDrive(
     private val turnLimiter = SlewRateLimiter(turnLimiter)
 
     /** {@inheritDoc}  */
-    override fun execute(): DifferentialInput {
+    override fun execute(): DifferentialOutput {
         val linear: Double = driveLimiter.calculate(linearAxis() * driveModifier)
         val rotation: Double = turnLimiter.calculate(rotationalAxis() * turnModifier)
         val left = linear + rotation
         val right = linear - rotation
-        return DifferentialInput(left, right).clamp(1.0)
+        return DifferentialOutput(left, right).clamp(1.0)
     }
 }

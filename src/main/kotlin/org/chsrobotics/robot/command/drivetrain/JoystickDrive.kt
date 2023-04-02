@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase
 import org.chsrobotics.robot.Robot
 import org.chsrobotics.robot.Tuning
 import org.chsrobotics.robot.drivemode.ArcadeDrive
-import org.chsrobotics.robot.drivemode.DifferentialInput
+import org.chsrobotics.robot.drivemode.DifferentialOutput
 import org.chsrobotics.robot.subsystem.Drivetrain
 import org.chsrobotics.robot.subsystem.Led
 
@@ -46,16 +46,17 @@ class JoystickDrive : CommandBase() {
         }
 
         // Set Force Feedback
-        Robot.controller.setConstantForce(Robot.controller.rotationalAxis*2)
+        var avgSpeed = ((Robot.drivetrain.leftVelocity+Robot.drivetrain.rightVelocity)/2).meters.toDouble()
+        Robot.controller.setConstantForce(Robot.controller.rotationalAxis * avgSpeed * 0.25)
 
         // Set drivetrain motor outputs
-        Robot.drivetrain.speed = driveMode.execute()
+        Robot.drivetrain.output = driveMode.execute()
     }
 
     override fun end(interrupted: Boolean) {
         // Disable Force Feedback
         Robot.controller.setConstantForce(0.0)
 
-        Robot.drivetrain.speed = DifferentialInput(0.0, 0.0)
+        Robot.drivetrain.output = DifferentialOutput(0.0, 0.0)
     }
 }
