@@ -49,14 +49,17 @@ class JoystickDrive : CommandBase() {
         // Set Force Feedback
 //        var avgSpeed = ((Robot.drivetrain.leftVelocity+Robot.drivetrain.rightVelocity)/2).meters.toDouble()
 //        Robot.controller.setConstantForce(Robot.controller.rotationalAxis * avgSpeed * 0.25)
-        var centerForceMagnitude = 0.5
-        var centerForceGain = 2
-        var centerForce = clamp(
+        val centerForceMagnitude = 0.5
+        val centerForceGain = 2
+        val centerForce = clamp(
             -Robot.controller.rotationalAxis * Robot.controller.linearAxis * centerForceGain,
             -centerForceMagnitude,
             centerForceMagnitude
         )
         Robot.controller.setConstantForce(centerForce)
+
+        val resistance = Robot.controller.brakeAxis
+        Robot.controller.setDamperForce(resistance, resistance, 0.0, 0.0)
         // Robot.controller.setDamperForce(1.0, 1.0, centerForce, 0.0)
 
         // Set drivetrain motor outputs

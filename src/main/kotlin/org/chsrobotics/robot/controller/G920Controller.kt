@@ -7,12 +7,14 @@ class G920Controller : ForceFeedbackController(), Controller {
     private val controller = GenericHID(HardwareID.WHEEL_CONTROLLER)
     override val linearAxis: Double
         get() = (-controller.getRawAxis(1)+1)/2
+    val brakeAxis: Double
+        get() = (-controller.getRawAxis(2)+1)/2
     override val rotationalAxis: Double
         get() = controller.getRawAxis(0)
     override val slowModeAxis: Double
         get() = controller.getRawAxis(3)
     override val brakeModeButton: Boolean
-        get() = controller.getRawAxis(2) >= 25
+        get() = brakeAxis >= 25
     override val shifterButton: Boolean
         get() = controller.getRawButton(4)
     override val coneButton: Boolean
