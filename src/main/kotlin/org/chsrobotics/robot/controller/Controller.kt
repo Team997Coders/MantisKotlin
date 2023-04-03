@@ -9,5 +9,4 @@ interface Controller {
     val coneButton: Boolean
     val cubeButton: Boolean
     fun setRumble() {}
-    fun setConstantForce(magnitude: Double) {}
 }

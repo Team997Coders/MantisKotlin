@@ -7,6 +7,7 @@ import org.chsrobotics.robot.drivemode.ArcadeDrive
 import org.chsrobotics.robot.drivemode.DifferentialOutput
 import org.chsrobotics.robot.subsystem.Drivetrain
 import org.chsrobotics.robot.subsystem.Led
+import org.chsrobotics.robot.util.clamp
 
 class JoystickDrive : CommandBase() {
     private var driveMode = ArcadeDrive(
@@ -46,8 +47,17 @@ class JoystickDrive : CommandBase() {
         }
 
         // Set Force Feedback
-        var avgSpeed = ((Robot.drivetrain.leftVelocity+Robot.drivetrain.rightVelocity)/2).meters.toDouble()
-        Robot.controller.setConstantForce(Robot.controller.rotationalAxis * avgSpeed * 0.25)
+//        var avgSpeed = ((Robot.drivetrain.leftVelocity+Robot.drivetrain.rightVelocity)/2).meters.toDouble()
+//        Robot.controller.setConstantForce(Robot.controller.rotationalAxis * avgSpeed * 0.25)
+        var centerForceMagnitude = 0.5
+        var centerForceGain = 2
+        var centerForce = clamp(
+            -Robot.controller.rotationalAxis * Robot.controller.linearAxis * centerForceGain,
+            -centerForceMagnitude,
+            centerForceMagnitude
+        )
+        Robot.controller.setConstantForce(centerForce)
+        // Robot.controller.setDamperForce(1.0, 1.0, centerForce, 0.0)
 
         // Set drivetrain motor outputs
         Robot.drivetrain.output = driveMode.execute()
@@ -55,7 +65,7 @@ class JoystickDrive : CommandBase() {
 
     override fun end(interrupted: Boolean) {
         // Disable Force Feedback
-        Robot.controller.setConstantForce(0.0)
+        Robot.controller.stopAllForces()
 
         Robot.drivetrain.output = DifferentialOutput(0.0, 0.0)
     }
