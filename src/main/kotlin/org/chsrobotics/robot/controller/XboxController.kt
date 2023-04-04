@@ -11,6 +11,7 @@ class XboxController : Controller {
         get() = driverController.leftY
     override val rotationalAxis: Double
         get() = driverController.rightX
+    // TODO make slow mode go to 0
     override val slowModeAxis: Double
         get() = driverController.leftTriggerAxis
     override val brakeModeButton: Boolean
